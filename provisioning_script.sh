@@ -13,7 +13,8 @@ set -eo pipefail
 # ส่วนที่ 0: หา path จริงของ ComfyUI บนเครื่องนี้
 # ----------------------------------------------------------------------------
 echo ">>> กำลังค้นหาโฟลเดอร์ ComfyUI บนเครื่องนี้..."
-COMFY_DIR=$(find / -maxdepth 5 -iname "ComfyUI" -type d 2>/dev/null | head -n 1)
+# เกิดBug เลยไม่ได้ใช้ COMFY_DIR=$(find / -maxdepth 5 -iname "ComfyUI" -type d 2>/dev/null | head -n 1)
+COMFY_DIR=$(find / -maxdepth 5 -iname "ComfyUI" -type d 2>/dev/null -print -quit)
 
 if [ -z "$COMFY_DIR" ]; then
   COMFY_DIR="/workspace/ComfyUI"
@@ -58,11 +59,20 @@ download_if_missing \
   "$MODELS_DIR/diffusion_models/acestep_v1.5_xl_turbo_bf16.safetensors"
 
 # ----------------------------------------------------------------------------
-# ส่วนที่ 2: Text Encoder — 1.7B (แนะนำสำหรับ tier 12-16GB ตามเอกสารทางการ)
+# ส่วนที่ 2: Text Encoder — (Dual: 0.6B + 4B)          
 # ----------------------------------------------------------------------------
+#**** ไม่ได้ใช้แล้ว1.7B (แนะนำสำหรับ tier 12-16GB ตามเอกสารทางการ)
+#download_if_missing \
+#  "https://huggingface.co/Comfy-Org/ace_step_1.5_ComfyUI_files/resolve/main/split_files/text_encoders/qwen_1.7b_ace15.safetensors" \
+#  "$MODELS_DIR/text_encoders/qwen_1.7b_ace15.safetensors"
+# ดาวน์โหลด 0.6B
 download_if_missing \
-  "https://huggingface.co/Comfy-Org/ace_step_1.5_ComfyUI_files/resolve/main/split_files/text_encoders/qwen_1.7b_ace15.safetensors" \
-  "$MODELS_DIR/text_encoders/qwen_1.7b_ace15.safetensors"
+  "https://huggingface.co/Comfy-Org/ace_step_1.5_ComfyUI_files/resolve/main/split_files/text_encoders/qwen_0.6b_ace15.safetensors" \
+  "$MODELS_DIR/text_encoders/qwen_0.6b_ace15.safetensors"
+# ดาวน์โหลด 4b
+download_if_missing \
+  "https://huggingface.co/Comfy-Org/ace_step_1.5_ComfyUI_files/resolve/main/split_files/text_encoders/qwen_4b_ace15.safetensors" \
+  "$MODELS_DIR/text_encoders/qwen_4b_ace15.safetensors"
 
 # ----------------------------------------------------------------------------
 # ส่วนที่ 3: VAE
